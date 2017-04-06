@@ -15,12 +15,16 @@ echo "-----> Fetching AWS CLI into slug"
 curl --progress-bar -o /tmp/awscli-bundle.zip $AWS_CLI_URL
 unzip -qq -d "$BUILD_DIR/vendor" /tmp/awscli-bundle.zip
 
-echo "-----> adding installer script into app/.profile.d"
-mkdir -p $BUILD_DIR/.profile.d
-cp "$BUILDPACK_DIR/bin/install_awscli.sh" $BUILD_DIR/.profile.d/
-chmod +x $BUILD_DIR/.profile.d/install_awscli.sh
-
 #cleaning up...
 rm -rf /tmp/awscli*
+
+echo "-----> Installing & Configuring awscli"
+
+INSTALL_DIR="$BUILD_DIR/vendor/awscli"
+chmod +x $BUILD_DIR/vendor/awscli-bundle/install
+$BUILD_DIR/vendor/awscli-bundle/install -i $INSTALL_DIR
+chmod u+x $INSTALL_DIR/bin/aws
+export PATH="$PATH:$INSTALL_DIR/bin"
+aws configure set region "us-east-1"
 
 echo "-----> aws cli installation done"
